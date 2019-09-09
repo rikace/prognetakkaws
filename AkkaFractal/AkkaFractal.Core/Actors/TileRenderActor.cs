@@ -37,8 +37,9 @@ namespace AkkaFractal.Core.Akka
         protected override SupervisorStrategy SupervisorStrategy()
         {
             // TODO
-            // implement SupervisorStrategy to resume the actor in case of 
+            // implement the "SupervisorStrategy" to resume the actor in case of 
             // "ArgumentException" 
+            
           return base.SupervisorStrategy();
         }
 

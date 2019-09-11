@@ -14,14 +14,15 @@ namespace AkkaFractal.Web.Akka
     {
         string destination = @"./image.jpg";
         private Image<Rgba32> image;
-        public RenderActor(IServerSentEventsService serverSentEventsService, int width, int height, int split) 
+        public RenderActor(IServerSentEventsService serverSentEventsService, 
+                int width, int height, int split) 
         {
             image = new Image<Rgba32>(width, height);
             var ys = height / split;
             var xs = width / split;
 
             var totalMessages = ys + xs;
-            WriteLineGreen($"YS {ys}");
+        
             WriteLineGreen($"totalMessages {totalMessages}");
   
             int count = 0;
@@ -50,16 +51,21 @@ namespace AkkaFractal.Web.Akka
                 }
             };
 
-            Action<Completed> complete = _ =>
+            Action<Completed> completeAction = _ =>
             {
                 image.Save(destination);
                 WriteLineGreen("Tile render completed");
             };
 
-            // TODO 
-            // implement the two Actor Receiver that handle the message types:
+            // TODO lab 1 (a)
+            // implement the two Actor Receiver(s) that handle the message types:
             // - RenderedTile
             // - Completed
+            // The Lambdas have been already implemented above with the 
+            // "renderedTileAction" and "completeAction" 
+            //
+            // - Add some console printing in each "action" to print a message
+            //   that display the current Thread id.
         }
     }
 }

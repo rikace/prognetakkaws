@@ -21,9 +21,8 @@ namespace AkkaFractal.Core.Akka
                 var res = MandelbrotSet(
                     render.X, render.Y, render.Width, render.Height,
                     render.ImageWidth, render.ImageHeight, 0.5, -2.5, 1.5, -1.5);
-                
+
                 Sender.Tell(new RenderedTile(render.X, render.Y, res.ToByteArray()));
-                
             });
 
             Receive<SimulateError>(_ =>
@@ -33,12 +32,12 @@ namespace AkkaFractal.Core.Akka
             });
         }
 
-        
+        // TODO lab 2 (a) - Supervision
+        // implement the "SupervisorStrategy" to resume the actor in case of 
+        // "ArgumentException" 
+        // Then try to apply different strategies such as "Directive.Resume" and "Directive.Escalate"
         protected override SupervisorStrategy SupervisorStrategy()
-        {
-            // TODO
-            // implement SupervisorStrategy to resume the actor in case of 
-            // "ArgumentException" 
+        {   
           return base.SupervisorStrategy();
         }
 

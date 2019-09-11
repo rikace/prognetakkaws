@@ -3,10 +3,7 @@ using Akka.Actor;
 using Lib.AspNetCore.ServerSentEvents;
 using AkkaFractal.Core;
 using static AkkaFractal.Core.ColorConsole;
-using Newtonsoft.Json;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using static AkkaFractal.Core.ColorConsole;
+
 
 namespace AkkaFractal.Web.Akka
 {
@@ -25,18 +22,22 @@ namespace AkkaFractal.Web.Akka
 
                 WriteLineYellow($"Starting image processing size Width {request.Width} - Height {request.Height}");
                 
-                // TODO
-                // Complete the "RenderActor" actor in the "Akka" folder.
+                // TODO lab 1 (a)
+                // Complete the "RenderActor" actor located inside the "Akka" folder.
                 // This Actor should receive two message types:
                 // - "RenderedTile" that uses the local lambda "renderedTileAction"
                 // - "Complete" that triggers the local lambda "complete"
-                
-                // TODO replace this line of code with the code
-                // that instantiate the renderActor IActorRef as a Child
+                // 
+                // replace the following line of code "Nobody.Instance" with the
+                // instantiation of the renderActor IActorRef as a Child of this current Actor "SseTileActor".
+                //
                 // NOTE: This actor should be implemented only once if and only if 
-                //       it is not instantiated yet (use the local "Context" to check) 
+                //       it is not already instantiated
+                //         (you could use the local "Context" to check if an actor with the same name already exist) 
                 // NOTE: To create a Child Actor you should use the current "Context"
-                renderActor = Nobody.Instance;
+                
+                renderActor = 
+                    Nobody.Instance;
                 
                 for (var y = 0; y < split; y++)
                 {
@@ -45,33 +46,43 @@ namespace AkkaFractal.Web.Akka
                     {
                         var xx = xs * x;
                         
-                        // TODO
-                        // pass the previously instantiated "renderActor" IActorRef as the "Sender" of the following "tileRenderActor" Message-Payload.
-                        // in this way, when the "tileRenderActor" completes the computation, the response send with "Sender.Tell" will be sent
+                        // TODO lab 1 (b)
+                        // pass the previously instantiated "renderActor" IActorRef as the "Sender"
+                        // of the following "tileRenderActor" Message-Payload.
+                        // in this way, when the "tileRenderActor" completes the computation,
+                        // the response sent with the  "Sender.Tell" will be sent
                         // to the "renderActor" actor rather then the current "SseTileActor"
                         tileRenderActor.Tell(new RenderTile(yy, xx, xs, ys, request.Height, request.Width));
                     }
                     
-                    // TODO 
-                    // implement "SupervisorStrategy" in the "tileRenderActor" actor
-                    // then uncomment this line and test the code
-                  // if (y / split == 0)
-                  // {
-                  //      WriteLineCyan($"simulating Actor crash");
-                  //      tileRenderActor.Tell(new SimulateError());
-                  // }
+                    // TODO lab (b) - Supervision  
+                    // implement the "SupervisorStrategy" in the "tileRenderActor" actor
+                    // then uncomment these lines of code to test
+                      // if (y / split == 0)
+                      // {
+                      //      WriteLineCyan($"simulating Actor crash");
+                      //      tileRenderActor.Tell(new SimulateError());
+                      // }
                 }
 
-                // TODO
-                // Same as previous TODO 
+                // TODO lab 1 (b) - same as previous "TODO lab 1 (b)"
                 // 
-                // pass the previously instantiated "renderActor" IActorRef as the "Sender" of the following "tileRenderActor" Message-Payload.
-                // in this way, when the "tileRenderActor" completes the computation, the response send with "Sender.Tell" will be sent
+                // pass the previously instantiated "renderActor" IActorRef as the "Sender"
+                // of the following "tileRenderActor" Message-Payload.
+                // In this way, when the "tileRenderActor" completes the computation,
+                // the response sent with the "Sender.Tell" will be sent
                 // to the "renderActor" actor rather then the current "SseTileActor"
-               
                 tileRenderActor.Tell(new Completed());
                 WriteLineYellow($"Image processing completed");
             });
+        }
+
+        // TODO Lab2 : Supervision
+        // implement the "SupervisorStrategy" to Restart the actor in case of 
+        // "ArgumentException" 
+        protected override SupervisorStrategy SupervisorStrategy()
+        {  
+            return base.SupervisorStrategy();
         }
     }
 }

@@ -32,12 +32,10 @@ namespace AkkaFractal.Web
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<CookiePolicyOptions>(options =>
             {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
@@ -49,25 +47,33 @@ namespace AkkaFractal.Web
                 options.KeepaliveMode = ServerSentEventsKeepaliveMode.Always;
                 options.KeepaliveInterval = 15;
             });
+            
             services.AddSingleton(_ => ActorSystem.Create("fractal", ConfigurationLoader.Load()));
+      
             services.AddSingleton<SseTileActorProvider>(provider =>
             {
                 var serverSentEventsService = provider.GetService<IServerSentEventsService>();
 
                 var actorSystem = provider.GetService<ActorSystem>();
                 
-                // TODO
-                // create the instantiation of the "tileRenderActor" using the "TileRenderActor" actor.
-                // After the first successful run, increase the level of parallelism using either a 
-                // Pool routing that distributes the work across its children (routee), or modifying the
+                // TODO lab 1 (a)
+                // replace the following line of code "ActorRefs.Nobody" with an instance
+                // of the "tileRenderActor" using the "TileRenderActor" actor.
+                // NOTE: To create an Actor instance you should use "Props".
+               
+                var tileRenderActor = 
+                    ActorRefs.Nobody;
+               
+                // TODO lab 2 (c)
+                // After the first successful run, increase the level of parallelism of the 
+                // "tileRenderActor" actor using either a Pool routing that distributes
+                // the work across its children (routee), or modifying the
                 // HOCON config (akka.conf) file section "localactor"
-                // var tileRenderActor = Nobody.Instance;
-
-                // LINK doc with different routing
+                //
+                // this is the LINK to the doc with different route options
                 // https://getakka.net/articles/actors/routers.html
-                var tileRenderActor = ActorRefs.Nobody;
                 
-
+                
                 var sseTileActor = actorSystem.ActorOf(Props.Create(() => new SseTileActor(serverSentEventsService, tileRenderActor)), "sse-tile");
                 return () => sseTileActor;
             });
@@ -83,7 +89,6 @@ namespace AkkaFractal.Web
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
@@ -99,6 +104,7 @@ namespace AkkaFractal.Web
             });
 
             app.MapServerSentEvents("/fractal-tiles");
+            
             lifetime.ApplicationStarted.Register(() =>
             {
                 app.ApplicationServices.GetService<ActorSystem>(); // Start Akka.NET

@@ -14,6 +14,7 @@ namespace AkkaFractal.Web.Akka
     {
         string destination = @"./image.jpg";
         private Image<Rgba32> image;
+        
         public RenderActor(IServerSentEventsService serverSentEventsService, 
                 int width, int height, int split) 
         {

@@ -74,7 +74,7 @@ namespace AkkaFractal.Web
                 // https://getakka.net/articles/actors/routers.html
                 
                 
-                var sseTileActor = actorSystem.ActorOf(Props.Create(() => new SseTileActor(serverSentEventsService, tileRenderActor)), "sse-tile");
+                var sseTileActor = actorSystem.ActorOf(Props.Create(() => new SseTileActor(serverSentEventsService, tileRenderActor)), "localactor");
                 return () => sseTileActor;
             });
         }

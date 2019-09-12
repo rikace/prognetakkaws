@@ -12,6 +12,8 @@ namespace AkkaFractal.Core.Akka
     {
         public TileRenderActor()
         {
+            Receive<Completed>(c => Sender.Tell(c));
+
             Receive<RenderTile>(render =>
             {
                 Console.WriteLine("{0} rendering {1},{2}", Self, render.X, render.Y);

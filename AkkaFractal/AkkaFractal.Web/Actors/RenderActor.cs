@@ -67,6 +67,8 @@ namespace AkkaFractal.Web.Akka
             //
             // - Add some console printing in each "action" to print a message
             //   that display the current Thread id.
+			ReceiveAsync<RenderedTile>(renderedTileAction);
+            Receive<Completed>(completeAction);
         }
     }
 }

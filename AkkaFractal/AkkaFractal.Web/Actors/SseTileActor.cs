@@ -35,10 +35,20 @@ namespace AkkaFractal.Web.Akka
                 //       it is not already instantiated
                 //         (you could use the local "Context" to check if an actor with the same name already exist) 
                 // NOTE: To create a Child Actor you should use the current "Context"
-                
-                renderActor = 
-                    Nobody.Instance;
-                
+
+                // renderActor = Nobody.Instance;
+
+                if (Context.Child("RenderActor").Equals(ActorRefs.Nobody))
+                {
+                    WriteLineYellow($"Creating child actor RenderActor");
+
+                    renderActor =
+                        Context.ActorOf(
+                            Props.Create(() =>
+                                new RenderActor(serverSentEventsService, request.Width, request.Height, split)),
+                            "RenderActor");
+                }
+
                 for (var y = 0; y < split; y++)
                 {
                     var yy = ys * y;
@@ -52,7 +62,8 @@ namespace AkkaFractal.Web.Akka
                         // in this way, when the "tileRenderActor" completes the computation,
                         // the response sent with the  "Sender.Tell" will be sent
                         // to the "renderActor" actor rather then the current "SseTileActor"
-                        tileRenderActor.Tell(new RenderTile(yy, xx, xs, ys, request.Height, request.Width));
+                        tileRenderActor.Tell(new RenderTile(yy, xx, xs, ys, request.Height, request.Width)
+                            , renderActor);
                     }
                     
                     // TODO lab (b) - Supervision  
@@ -72,7 +83,8 @@ namespace AkkaFractal.Web.Akka
                 // In this way, when the "tileRenderActor" completes the computation,
                 // the response sent with the "Sender.Tell" will be sent
                 // to the "renderActor" actor rather then the current "SseTileActor"
-                tileRenderActor.Tell(new Completed());
+
+                tileRenderActor.Tell(new Completed(), renderActor);
                 WriteLineYellow($"Image processing completed");
             });
         }

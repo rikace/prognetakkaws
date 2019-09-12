@@ -61,8 +61,8 @@ namespace AkkaFractal.Web
                 // of the "tileRenderActor" using the "TileRenderActor" actor.
                 // NOTE: To create an Actor instance you should use "Props".
                
-                var tileRenderActor = 
-                    ActorRefs.Nobody;
+                // var tileRenderActor = 
+                   // ActorRefs.Nobody;
                
                 // TODO lab 2 (c)
                 // After the first successful run, increase the level of parallelism of the 
@@ -72,9 +72,17 @@ namespace AkkaFractal.Web
                 //
                 // this is the LINK to the doc with different route options
                 // https://getakka.net/articles/actors/routers.html
-                
-                
-                var sseTileActor = actorSystem.ActorOf(Props.Create(() => new SseTileActor(serverSentEventsService, tileRenderActor)), "localactor");
+                var tileRenderActor = actorSystem.ActorOf(Props.Create<TileRenderActor>());
+                    
+					// TODO Lab 3 (b)
+                    // apply the remote deployment routing 
+                    // to remote deploy the "tileRenderActor" actor to the remote
+                    // Actor System in the "AkkaFractal.Remote" project.
+                    //     - either use the configuration section in the local "akka.conf" file
+                    //       or the code approach (using for example the "Address.Parse")
+                    //       reference doc here https://getakka.net/articles/remoting/deployment.html 
+
+                var sseTileActor = actorSystem.ActorOf(Props.Create(() => new SseTileActor(serverSentEventsService, tileRenderActor)), "sse-tile");
                 return () => sseTileActor;
             });
         }

@@ -46,8 +46,27 @@ namespace AkkaFractal.Core.Akka
         // "ArgumentException" 
         // Then try to apply different strategies such as "Directive.Resume" and "Directive.Escalate"
         protected override SupervisorStrategy SupervisorStrategy()
-        {   
-          return base.SupervisorStrategy();
+        {
+            return new OneForOneStrategy(
+                3,
+                TimeSpan.FromSeconds(10),
+                x =>
+                {
+                    Console.WriteLine("Invoking supervision strategy from TileRenderActor");
+                    if (x is ArgumentOutOfRangeException)
+                    {
+                        Console.WriteLine("Restarting actor");
+                        return Directive.Restart;
+                    }
+
+                    if (x is ArgumentException)
+                    {
+                        Console.WriteLine("Resuming actor");
+                        return Directive.Resume;
+                    }
+
+                    return Directive.Escalate;
+                });
         }
 
 

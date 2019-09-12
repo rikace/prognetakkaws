@@ -18,11 +18,15 @@ namespace AkkaFractal.Remote
             //      (if you choose the code approach to configure the remote deployment in the "AkkaFractal.Web"
             //       project, then you should use that name
 
-            //Console.Title = $"Remote Worker - {system.Name}";
-            Console.ForegroundColor = ConsoleColor.Green;
+            var config = ConfigurationLoader.Load();
+            using (var system = ActorSystem.Create("RemoteSystem", config))
+			{
+            	Console.Title = $"Remote Worker - {system.Name}";
+            	Console.ForegroundColor = ConsoleColor.Green;
 
-            Console.WriteLine("Press [ENTER] to exit.");
-            Console.ReadLine();
+	            Console.WriteLine("Press [ENTER] to exit.");
+    	        Console.ReadLine();
+			}
         }
     }
 }

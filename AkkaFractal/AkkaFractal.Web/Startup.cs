@@ -72,7 +72,8 @@ namespace AkkaFractal.Web
                 //
                 // this is the LINK to the doc with different route options
                 // https://getakka.net/articles/actors/routers.html
-                var tileRenderActor = actorSystem.ActorOf(Props.Create<TileRenderActor>());
+    			var tileRenderActor = actorSystem.ActorOf(Props.Create<TileRenderActor>()
+                    .WithRouter(FromConfig.Instance), "remoteactor");
                     
 					// TODO Lab 3 (b)
                     // apply the remote deployment routing 

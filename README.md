@@ -39,9 +39,11 @@ Please go through these steps before the workshop, to ensure you don't spend tim
     - Check the appropriate drive and click `Apply`
     - Enter your user account's password and click `OK`.
 
-- **Test the installation by running the offical Jenkins container**. It will download the image from Docker Hub if it doesn't find it already in your local Docker repo:
+- **Test the installation by running the offical MongoDb container**. It will download the image from Docker Hub if it doesn't find it already in your local Docker repo:
 
-    `docker start -p 27017:27017 --name mongodb -d mongo`
+    `docker run --rm -p 27017:27017 --name mongodb -d mongo`
+ Once that starts you have a working Docker installation and you can stop the container with 
+    `docker stop mongodb`
 
 ## Install Robomongo (Optional)
 

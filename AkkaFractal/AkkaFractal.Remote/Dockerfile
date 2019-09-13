@@ -15,7 +15,14 @@ FROM microsoft/dotnet:2.1-sdk AS base
 
 #   - expose the port to make the Actor System reachable from outside
 
+WORKDIR /app
+
+COPY ./bin/PUBLISH/netcoreapp2.1/ /app
+
+EXPOSE 8090
+
 CMD ["dotnet", "AkkaFractal.Remote.dll"]
+
 
 
 # TODO lab (4)

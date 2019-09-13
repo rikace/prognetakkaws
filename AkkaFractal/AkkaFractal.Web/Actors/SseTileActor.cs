@@ -1,5 +1,6 @@
 using System;
 using Akka.Actor;
+using Akka.Persistence;
 using Lib.AspNetCore.ServerSentEvents;
 using AkkaFractal.Core;
 using static AkkaFractal.Core.ColorConsole;
@@ -9,14 +10,48 @@ namespace AkkaFractal.Web.Akka
 {
     public delegate IActorRef SseTileActorProvider();
 
-    public class SseTileActor : ReceiveActor
+    public class SseTileActor : ReceivePersistentActor
     {
         private IActorRef renderActor;
+        private RenderImage _state;
+        
+        public override string PersistenceId { get; } = "sse-actor";
+
         public SseTileActor(IServerSentEventsService serverSentEventsService, IActorRef tileRenderActor)
         {
-            Receive<RenderImage>(request =>
+            var split = 20;
+            
+            Recover<RenderImage>(request =>
             {
-                var split = 20;
+                WriteLineGreen($"Replaying RenderImage from journal");
+                _state = request;
+                
+                if (Context.Child("RenderActor").Equals(ActorRefs.Nobody))
+                {
+                    WriteLineYellow($"Creating child actor RenderActor");
+
+                    renderActor =
+                        Context.ActorOf(
+                            Props.Create(() =>
+                                new RenderActor(serverSentEventsService, request.Width, request.Height, split)),
+                            "RenderActor");
+                }
+            });
+            
+            
+            Recover<SnapshotOffer>(offer =>
+            {
+                WriteLineCyan($"Received SnapshotOffer from snapshot store, updating state");
+
+                _state = (RenderImage)offer.Snapshot;
+
+                WriteLineCyan($"State set to Height {_state.Height} and to Width {_state.Width} from snapshot");
+            });
+            
+            Command<RenderImage>(request =>
+            {
+                _state = request;
+                
                 var ys = request.Height / split;
                 var xs = request.Width / split;
 

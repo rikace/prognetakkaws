@@ -20,6 +20,11 @@ namespace AkkaFractal.Remote
             //      (if you choose the code approach to configure the remote deployment in the "AkkaFractal.Web"
             //       project, then you should use that name
 
+            // TODO Lab 6 (a)
+            // change the name of the Actor System to be consistent across the 
+            // Actor System(s) in the application.
+            // To cluster the Actor Systems together, all must have the same name
+            // (check all the reference in the "akka.conf" files)
             var config = ConfigurationLoader.Load();
             using (var system = ActorSystem.Create("fractal", config))
             {

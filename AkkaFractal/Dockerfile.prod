@@ -1,0 +1,38 @@
+FROM microsoft/dotnet:2.1-sdk AS builder
+
+WORKDIR /app
+COPY ./AkkaFractal.Remote/AkkaFractal.Remote.csproj ./src/AkkaFractal.Remote/AkkaFractal.Remote.csproj
+COPY ./AkkaFractal.Core/AkkaFractal.Core.csproj ./src/AkkaFractal.Core/AkkaFractal.Core.csproj
+
+RUN dotnet restore ./src/AkkaFractal.Core/AkkaFractal.Core.csproj # --verbosity quiet
+RUN dotnet restore ./src/AkkaFractal.Remote/AkkaFractal.Remote.csproj # --verbosity quiet 
+
+WORKDIR ./src/AkkaFractal.Remote/
+RUN dotnet restore
+WORKDIR /app
+
+# Copy all source code to image.
+COPY ./AkkaFractal.Remote ./src/AkkaFractal.Remote
+COPY ./AkkaFractal.Core ./src/AkkaFractal.Core
+
+WORKDIR ./src/AkkaFractal.Remote/
+RUN dotnet build  AkkaFractal.Remote.csproj -c Release
+RUN dotnet publish AkkaFractal.Remote.csproj -c Release -o publish
+
+FROM microsoft/dotnet:2.1-sdk AS runner
+WORKDIR /app
+
+COPY --from=builder /app/src/AkkaFractal.Remote/publish/ .
+
+EXPOSE 8090
+
+CMD ["dotnet", "AkkaFractal.Remote.dll"]
+
+#######################
+## OK
+# BUILD
+
+# docker build -f Dockerfile.Prod -t rik/test1 .
+# RUN
+#docker run -p 8090:8090 -i rik/test1
+

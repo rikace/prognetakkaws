@@ -21,14 +21,14 @@ namespace AkkaFractal.Remote
             //       project, then you should use that name
 
             var config = ConfigurationLoader.Load();
-            using (var system = ActorSystem.Create("RemoteSystem", config))
-			{
-            	Console.Title = $"Remote Worker - {system.Name}";
-            	Console.ForegroundColor = ConsoleColor.Green;
-
-	            Console.WriteLine("Press [ENTER] to exit.");
-    	        Console.ReadLine();
-			}
+            using (var system = ActorSystem.Create("fractal", config))
+            {
+                Console.Title = $"Remote Worker - {system.Name}";
+                Console.ForegroundColor = ConsoleColor.Green;
+                
+                Console.WriteLine("Press [ENTER] to exit.");
+                Console.ReadLine();
+            }
         }
     }
 }

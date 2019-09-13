@@ -14,17 +14,18 @@ namespace AkkaFractal.Web.Akka
     {
         string destination = @"./image.jpg";
         private Image<Rgba32> image;
-        public RenderActor(IServerSentEventsService serverSentEventsService, 
-                int width, int height, int split) 
+
+        public RenderActor(IServerSentEventsService serverSentEventsService,
+            int width, int height, int split)
         {
             image = new Image<Rgba32>(width, height);
             var ys = height / split;
             var xs = width / split;
 
             var totalMessages = ys + xs;
-        
+
             WriteLineGreen($"totalMessages {totalMessages}");
-  
+
             int count = 0;
 
             Func<RenderedTile, Task> renderedTileAction = async tile =>
@@ -66,7 +67,7 @@ namespace AkkaFractal.Web.Akka
             //
             // - Add some console printing in each "action" to print a message
             //   that display the current Thread id.
-			ReceiveAsync<RenderedTile>(renderedTileAction);
+            ReceiveAsync<RenderedTile>(renderedTileAction);
             Receive<Completed>(completeAction);
         }
     }

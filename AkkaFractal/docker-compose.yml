@@ -1,0 +1,81 @@
+# link for lighthouse https://github.com/petabridge/lighthouse
+
+#docker run --name lighthouse1 --hostname lighthouse1 -p 4053:4053 -p 9110:9110 --env ACTORSYSTEM=fractal --env CLUSTER_IP=lighthouse1 --env CLUSTER_PORT=4053 --env CLUSTER_SEEDS="akka.tcp://fractak@lighthouse1:4053" petabridge/lighthouse:latest
+# network ?
+
+version: '3.4'
+services:
+  lighthouse:
+    image: petabridge/lighthouse:latest
+    hostname: lighthouse
+    ports:
+      # Port 9110 is exposed so as to allow the Petrabridge.cmd client (https://cmd.petabridge.com/)
+      # to connect to it. The lighthouse includes the Petabridge cluster extension allowing one to
+      # easily view connected nodes
+      - '9110:9110'
+    environment:
+      ACTORSYSTEM: "fractal"
+      # The cluster IP (bit of a misnomer, here it's the hostname) is derived from the service name (lighthouse)
+      CLUSTER_IP: "lighthouse"
+      CLUSTER_PORT: 4053
+      CLUSTER_SEEDS: "akka.tcp://fractal@lighthouse:4053"
+
+  akkafractal.web:    
+    #image: ${DOCKER_REGISTRY-}akkafractalweb
+    build:
+      context: AkkaFractal.Web
+      dockerfile: Dockerfile
+      target: builder
+    ports:
+      # Akka Fractal port
+      - "5000:5000"
+      # Map port 9110 to 9111. Port 9111 is used to connect to Petabridge.cmd for this node
+      - '9111:9110'
+    depends_on:
+      - akkafractal.worker.1
+      - akkafractal.worker.2
+      - lighthouse
+   #   - mongo.db
+    environment:
+      ASPNETCORE_ENVIRONMENT: local
+      CLUSTER_IP: akkafractal.web
+      CLUSTER_PORT: 4053
+
+
+  akkafractal.worker.1:
+    # Injected by visual studio, which messes with the image
+    #image: ${DOCKER_REGISTRY-}playgroundworker
+    build:
+      context: AkkaFractal.Remote
+      dockerfile: Dockerfile
+      target: builder
+    ports:
+      # Map port 9110 to 9112. Port 9112 is used to connect to Petabridge.cmd for this node
+      - '9112:9110'
+    depends_on:
+      - lighthouse
+     # - mongo.db
+    environment:
+      CLUSTER_IP: akkafractal.worker.1
+      CLUSTER_PORT: 4053
+
+  akkafractal.worker.2:
+      # Injected by visual studio, which messes with the image
+     #image: ${DOCKER_REGISTRY-}playgroundworker
+      build:
+        context: AkkaFractal.Remote
+        dockerfile: Dockerfile
+        target: builder
+      ports:
+        # Map port 9110 to 9112. Port 9112 is used to connect to Petabridge.cmd for this node
+        - '9113:9110'
+      depends_on:
+        - lighthouse
+       # - mongo.db 
+      environment:
+        CLUSTER_IP: akkafractal.worker.2
+        CLUSTER_PORT: 4053        
+#  mongo.db:
+#    image: mongo:latest
+#    ports:      
+#      - '27017:27017'

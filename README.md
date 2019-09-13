@@ -1,3 +1,10 @@
+# Summary of branches 
+- Branch `Step 1` contains implementation of the basic project with Actor commuinication
+- Branch `Step 2` contains implementation of Actor Supervision and Actor Routing 
+- Branch `Step 3` contains implementation of Actor Remoting (and Docker container to run the Web and Remote projects)
+- Branch `Step 4` contains implementation of Actor Slustering (see compose.yml file to start the cluster)
+- Branch `Step 5` contains implementation of Actor Persistent
+
 # Install .NET SDK
 
 Verify the .NET SDK version installed on your PC. Open a command prompt and run the following command...
